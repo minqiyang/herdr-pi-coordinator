@@ -8,10 +8,56 @@ Declared version: **6.2-draft**. Identity is filename + declared version.
 | `herdr_pi_runtime.md` | Herdr/Pi process, lock/CAS, GitHub publication |
 | `routing_table.json` | routes, models, triggers |
 
-## 使用方法
+## How to use
 
-1. Clone 本仓库，或让 coordinator 能读到这三份文件。
-2. 把下面整段复制给 Pi coordinator（新项目和既有项目都用这一段）。
+### Simple
+
+1. Clone this repository, or download the three files above into one folder.
+2. Open Pi.
+3. Drag those three files into the Pi coordinator (or start Pi in that folder so it can read them from the working tree).
+4. Paste the prompt at the bottom of this page.
+
+### Recommended: Herdr workspace, Pi coordinator
+
+Use this when you want visible process topology. The coordinator is **Pi**. Workers live in other Herdr tabs.
+
+```mermaid
+flowchart LR
+  clone[Clone this repo] --> ws[Herdr workspace]
+  ws --> coordTab[Coordinator tab]
+  ws --> workTabs[Worker / reviewer / QA tabs]
+  coordTab --> pi[Pi coordinator]
+  files[Three policy files] --> pi
+  pi -->|dispatches| workTabs
+```
+
+```text
+Herdr workspace
+├── Tab: coordinator  →  Pi   (reads the three files, does not implement)
+├── Tab: worker
+├── Tab: reviewer
+└── Tab: QA shell
+```
+
+In a terminal:
+
+```bash
+git clone https://github.com/minqiyang/herdr-pi-coordinator.git
+cd herdr-pi-coordinator
+herdr workspace create --cwd "$PWD" --label coordinator
+```
+
+The create response includes `root_pane.pane_id`. Start Pi in that pane:
+
+```bash
+herdr agent start coord --kind pi --pane <root_pane_id>
+```
+
+Keep the coordinator alone in that tab. Independent work goes in a **new tab**, not a split of the coordinator tab. Then paste the prompt below into Pi.
+
+## Prompt to paste into Pi
+
+New projects and existing projects use the same text. Copy the whole block.
 
 ```text
 Read these three files. They are the only policy. Declared version: 6.2-draft.
@@ -28,4 +74,4 @@ Then:
 - Already bound to 6.2-draft → recover, then COORD-02. HOLD per ADV-01 if the next step is not authorized.
 ```
 
-Clone this repository first so those three filenames resolve in the working tree. Do not substitute machine-specific absolute paths.
+Use the filenames as they appear in the clone. Do not replace them with machine-specific absolute paths.
