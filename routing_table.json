@@ -1,0 +1,216 @@
+{
+  "table_version": "6.2-draft",
+  "status": "TEMPLATE_NOT_ACTIVE",
+  "default_harness": "Pi",
+  "binding_identity_rule": "Underlying model identity is the normalized model field, independent of route label or harness.",
+  "route_selection": {
+    "card_names_exactly_one_route": true,
+    "coordinator_validates_and_does_not_substitute": true,
+    "default_route_eligible_iff": "no_non_default_route_of_same_capability_class_has_a_matching_trigger",
+    "non_default_route_eligible_iff": "at_least_one_of_its_recorded_triggers_matches",
+    "multiple_non_default_matches_in_class": "HOLD",
+    "named_route_not_eligible": "HOLD",
+    "no_eligible_route": "HOLD"
+  },
+  "general_execution_model": {
+    "model": "Grok 4.6",
+    "harness": "Pi",
+    "default_effort": "HIGH",
+    "allowed_effort_band": [
+      "HIGH"
+    ],
+    "may_author_plan": false
+  },
+  "review_seats": {
+    "STANDARD": [
+      "REVIEW"
+    ],
+    "CRITICAL": [
+      "REVIEW",
+      "AUDIT"
+    ]
+  },
+  "routes": {
+    "COORD": {
+      "capability": "control-namespace coordination and deterministic verification",
+      "capability_class": "coordination",
+      "default": true,
+      "may_author_plan": false,
+      "may_formally_review": false,
+      "primary": {
+        "model": "live_pi_session",
+        "harness": "Pi"
+      }
+    },
+    "GENERAL_EXEC": {
+      "capability": "ordinary implementation, debugging, fixing, and interaction logic",
+      "capability_class": "implementation",
+      "default": true,
+      "may_author_plan": false,
+      "may_formally_review": false,
+      "binding_ref": "general_execution_model",
+      "prompt_constraints": [
+        "scope_clamp"
+      ]
+    },
+    "REVIEW": {
+      "capability": "first formal review seat",
+      "capability_class": "review",
+      "default": true,
+      "may_author_plan": false,
+      "may_formally_review": true,
+      "binding_ref": "general_execution_model"
+    },
+    "DESIGN": {
+      "capability": "architecture, structural planning, and high-uncertainty design",
+      "capability_class": "design",
+      "default": false,
+      "may_author_plan": true,
+      "may_formally_review": false,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "DESIGN_BINDING_PLAN_AUTHOR",
+          "when": "card_requires_binding_plan_authorship"
+        },
+        {
+          "trigger_id": "DESIGN_ARCHITECTURE_DECISION",
+          "when": "required_output_is_architecture_or_interface_or_design_decision_not_implementation"
+        }
+      ],
+      "selection_rules": [
+        {
+          "rule_id": "DESIGN_STRUCTURAL",
+          "when": {
+            "structural": true
+          },
+          "binding": {
+            "model": "Fable 5",
+            "harness": "shared_harness",
+            "default_effort": "HIGH",
+            "allowed_effort_band": [
+              "HIGH"
+            ]
+          }
+        },
+        {
+          "rule_id": "DESIGN_NONSTRUCTURAL",
+          "when": {
+            "structural": false
+          },
+          "binding": {
+            "model": "GPT-5.6 Sol",
+            "harness": "Pi",
+            "default_effort": "XHIGH",
+            "allowed_effort_band": [
+              "HIGH",
+              "XHIGH"
+            ]
+          }
+        }
+      ],
+      "prompt_constraints": [
+        "scope_clamp"
+      ]
+    },
+    "FRONTEND": {
+      "capability": "aesthetic, visual, and art-direction design only",
+      "capability_class": "implementation",
+      "default": false,
+      "may_author_plan": false,
+      "may_formally_review": false,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "FRONTEND_DESIGN_SYSTEM",
+          "when": "card_output_is_design_system_tokens_or_visual_language"
+        },
+        {
+          "trigger_id": "FRONTEND_HIGH_FIDELITY",
+          "when": "card_output_is_high_fidelity_visual_composition"
+        },
+        {
+          "trigger_id": "FRONTEND_ART_DIRECTION",
+          "when": "card_output_is_art_direction_or_aesthetic_authority"
+        }
+      ],
+      "primary": {
+        "model": "Opus 5",
+        "harness": "shared_harness",
+        "default_effort": "XHIGH",
+        "allowed_effort_band": [
+          "XHIGH"
+        ]
+      },
+      "prompt_constraints": [
+        "scope_clamp"
+      ],
+      "hard_constraints": [
+        "no_implementation_or_interaction_logic",
+        "no_review_or_audit_seat",
+        "no_plan_authorship"
+      ]
+    },
+    "PREMIUM_EXEC": {
+      "capability": "named premium-trigger implementation",
+      "capability_class": "implementation",
+      "default": false,
+      "may_author_plan": false,
+      "may_formally_review": false,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "PREMIUM_HIDDEN_COUPLING",
+          "when": "card_records_hidden_cross_module_coupling_as_the_work"
+        },
+        {
+          "trigger_id": "PREMIUM_CROSS_LANE_INTEGRATION",
+          "when": "card_is_canonical_integration_across_lanes"
+        },
+        {
+          "trigger_id": "PREMIUM_PROVENANCE_ACCOUNTING",
+          "when": "card_objective_is_provenance_or_accounting_correctness"
+        }
+      ],
+      "primary": {
+        "model": "Fable 5",
+        "harness": "shared_harness",
+        "default_effort": "HIGH",
+        "allowed_effort_band": [
+          "HIGH"
+        ]
+      },
+      "prompt_constraints": [
+        "scope_clamp"
+      ]
+    },
+    "AUDIT": {
+      "capability": "second formal review seat and deep failure audit",
+      "capability_class": "review",
+      "default": true,
+      "may_author_plan": false,
+      "may_formally_review": true,
+      "primary": {
+        "model": "GPT-5.6 Sol",
+        "harness": "Pi",
+        "default_effort": "XHIGH",
+        "allowed_effort_band": [
+          "XHIGH"
+        ]
+      }
+    },
+    "PROSE": {
+      "capability": "natural-language deliverables",
+      "capability_class": "prose",
+      "default": true,
+      "may_author_plan": false,
+      "may_formally_review": false,
+      "primary": {
+        "model": "Gemini 3.7 Flash",
+        "harness": "shared_harness",
+        "default_effort": "MEDIUM",
+        "allowed_effort_band": [
+          "MEDIUM"
+        ]
+      }
+    }
+  },
+  "scope_clamp": "Stay strictly within this card's objective, authority, read scope, and write scope. If additional work is required, state the missing scope in one line and stop. Do not perform that additional work."
+}
