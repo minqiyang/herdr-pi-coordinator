@@ -28,12 +28,4 @@ Then:
 - Already bound to 6.2-draft → recover, then COORD-02. HOLD per ADV-01 if the next step is not authorized.
 ```
 
-本机这份副本的路径（若 coordinator 读的是 Documents 里的目录，把上面三个文件名换成）：
-
-```text
-/Users/rhapsoul/Documents/Codex/standards/herdr_pi_coordinator_v6_three_file/coordinator_standard.md
-/Users/rhapsoul/Documents/Codex/standards/herdr_pi_coordinator_v6_three_file/herdr_pi_runtime.md
-/Users/rhapsoul/Documents/Codex/standards/herdr_pi_coordinator_v6_three_file/routing_table.json
-```
-
-仓库：https://github.com/minqiyang/herdr-pi-coordinator
+Clone this repository first so those three filenames resolve in the working tree. Do not substitute machine-specific absolute paths.
