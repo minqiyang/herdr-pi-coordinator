@@ -1,33 +1,100 @@
 {
-  "table_version": "6.2-draft",
+  "table_version": "7.13-draft",
   "status": "TEMPLATE_NOT_ACTIVE",
-  "default_harness": "Pi",
-  "binding_identity_rule": "Underlying model identity is the normalized model field, independent of route label or harness.",
-  "route_selection": {
-    "card_names_exactly_one_route": true,
-    "coordinator_validates_and_does_not_substitute": true,
-    "default_route_eligible_iff": "no_non_default_route_of_same_capability_class_has_a_matching_trigger",
-    "non_default_route_eligible_iff": "at_least_one_of_its_recorded_triggers_matches",
-    "multiple_non_default_matches_in_class": "HOLD",
-    "named_route_not_eligible": "HOLD",
-    "no_eligible_route": "HOLD"
+  "child_session_defaults": {
+    "permission_mode": "auto"
+  },
+  "access_plans": {
+    "gemini_ai_pro": {
+      "display_name": "Google Gemini AI Pro",
+      "subscribed": true
+    },
+    "chatgpt_plus": {
+      "display_name": "ChatGPT Plus",
+      "subscribed": true
+    },
+    "supergrok_heavy": {
+      "display_name": "SuperGrok Heavy",
+      "subscribed": true
+    },
+    "cursor_ultra": {
+      "display_name": "Cursor Ultra",
+      "subscribed": true
+    },
+    "claude_direct": {
+      "display_name": "Claude direct subscription",
+      "subscribed": false
+    }
+  },
+  "model_aliases": {
+    "GEMINI_FLASH_LATEST": {
+      "family": "Gemini Flash",
+      "selector": "latest",
+      "access_plan_ref": "gemini_ai_pro"
+    },
+    "GPT_LATEST": {
+      "family": "GPT",
+      "selector": "latest",
+      "access_plan_ref": "chatgpt_plus"
+    },
+    "GROK_LATEST": {
+      "family": "Grok",
+      "selector": "latest",
+      "access_plan_ref": "supergrok_heavy"
+    },
+    "FABLE_LATEST": {
+      "family": "Fable",
+      "selector": "latest",
+      "access_plan_ref": "cursor_ultra"
+    },
+    "OPUS_LATEST": {
+      "family": "Opus",
+      "selector": "latest",
+      "access_plan_ref": "cursor_ultra"
+    }
+  },
+  "effort_profiles": {
+    "GPT_STANDARD": {
+      "default_effort": "medium",
+      "allowed_effort_band": [
+        "light",
+        "medium"
+      ]
+    }
   },
   "general_execution_model": {
-    "model": "Grok 4.6",
-    "harness": "Pi",
+    "model_ref": "GROK_LATEST",
+    "harness": "Grok Build",
     "default_effort": "HIGH",
     "allowed_effort_band": [
       "HIGH"
-    ],
-    "may_author_plan": false
+    ]
+  },
+  "highest_capability_model": {
+    "model_ref": "GPT_LATEST",
+    "harness": "Codex",
+    "default_effort": "high",
+    "allowed_effort_band": [
+      "high"
+    ]
+  },
+  "highest_capability_quota_alternative": {
+    "model_ref": "FABLE_LATEST",
+    "harness": "Cursor",
+    "default_effort": "HIGH",
+    "allowed_effort_band": [
+      "HIGH"
+    ]
   },
   "review_seats": {
     "STANDARD": [
-      "REVIEW"
+      "REVIEW",
+      "GROK_REVIEW"
     ],
     "CRITICAL": [
       "REVIEW",
-      "AUDIT"
+      "AUDIT",
+      "GROK_REVIEW"
     ]
   },
   "routes": {
@@ -43,7 +110,7 @@
       }
     },
     "GENERAL_EXEC": {
-      "capability": "ordinary implementation, debugging, fixing, and interaction logic",
+      "capability": "ordinary implementation, debugging, fixing, integration, and interaction logic",
       "capability_class": "implementation",
       "default": true,
       "may_author_plan": false,
@@ -59,10 +126,17 @@
       "default": true,
       "may_author_plan": false,
       "may_formally_review": true,
-      "binding_ref": "general_execution_model"
+      "primary": {
+        "model_ref": "GEMINI_FLASH_LATEST",
+        "harness": "Antigravity",
+        "default_effort": "HIGH",
+        "allowed_effort_band": [
+          "HIGH"
+        ]
+      }
     },
     "DESIGN": {
-      "capability": "architecture, structural planning, and high-uncertainty design",
+      "capability": "required architecture or interface decisions and binding-plan authorship; excludes ordinary implementation planning, local code adjustments, and bug-cause analysis",
       "capability_class": "design",
       "default": false,
       "may_author_plan": true,
@@ -74,43 +148,35 @@
         },
         {
           "trigger_id": "DESIGN_ARCHITECTURE_DECISION",
-          "when": "required_output_is_architecture_or_interface_or_design_decision_not_implementation"
-        }
-      ],
-      "selection_rules": [
-        {
-          "rule_id": "DESIGN_STRUCTURAL",
-          "when": {
-            "structural": true
-          },
-          "binding": {
-            "model": "Fable 5",
-            "harness": "shared_harness",
-            "default_effort": "HIGH",
-            "allowed_effort_band": [
-              "HIGH"
-            ]
-          }
-        },
-        {
-          "rule_id": "DESIGN_NONSTRUCTURAL",
-          "when": {
-            "structural": false
-          },
-          "binding": {
-            "model": "GPT-5.6 Sol",
-            "harness": "Pi",
-            "default_effort": "XHIGH",
-            "allowed_effort_band": [
-              "HIGH",
-              "XHIGH"
-            ]
-          }
+          "when": "required_deliverable_is_a_formal_architecture_or_interface_decision_not_ordinary_implementation_planning_local_code_adjustment_or_bug_cause_analysis"
         }
       ],
       "prompt_constraints": [
         "scope_clamp"
-      ]
+      ],
+      "quota_binding_order_ref": "problem_solving_quota_order"
+    },
+    "EXPERT": {
+      "capability": "final problem-solving escalation for unresolved design, architecture, planning, analysis, or implementation",
+      "capability_class": "problem_solving",
+      "default": false,
+      "may_author_plan": true,
+      "may_formally_review": false,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "EVIDENCED_BLOCKER_PERSISTS",
+          "when": "same_blocker_remains_after_required_qualifying_attempts_with_no_clear_general_fix_next_step_and_environment_permission_quota_and_requirement_ambiguity_causes_ruled_out",
+          "minimum_qualifying_attempts": 4
+        },
+        {
+          "trigger_id": "USER_REQUESTED_EXPERT",
+          "when": "user_explicitly_requests_expert_escalation_for_this_task"
+        }
+      ],
+      "prompt_constraints": [
+        "scope_clamp"
+      ],
+      "quota_binding_order_ref": "problem_solving_quota_order"
     },
     "FRONTEND": {
       "capability": "aesthetic, visual, and art-direction design only",
@@ -133,8 +199,8 @@
         }
       ],
       "primary": {
-        "model": "Opus 5",
-        "harness": "shared_harness",
+        "model_ref": "OPUS_LATEST",
+        "harness": "Cursor",
         "default_effort": "XHIGH",
         "allowed_effort_band": [
           "XHIGH"
@@ -149,38 +215,6 @@
         "no_plan_authorship"
       ]
     },
-    "PREMIUM_EXEC": {
-      "capability": "named premium-trigger implementation",
-      "capability_class": "implementation",
-      "default": false,
-      "may_author_plan": false,
-      "may_formally_review": false,
-      "dispatch_triggers": [
-        {
-          "trigger_id": "PREMIUM_HIDDEN_COUPLING",
-          "when": "card_records_hidden_cross_module_coupling_as_the_work"
-        },
-        {
-          "trigger_id": "PREMIUM_CROSS_LANE_INTEGRATION",
-          "when": "card_is_canonical_integration_across_lanes"
-        },
-        {
-          "trigger_id": "PREMIUM_PROVENANCE_ACCOUNTING",
-          "when": "card_objective_is_provenance_or_accounting_correctness"
-        }
-      ],
-      "primary": {
-        "model": "Fable 5",
-        "harness": "shared_harness",
-        "default_effort": "HIGH",
-        "allowed_effort_band": [
-          "HIGH"
-        ]
-      },
-      "prompt_constraints": [
-        "scope_clamp"
-      ]
-    },
     "AUDIT": {
       "capability": "second formal review seat and deep failure audit",
       "capability_class": "review",
@@ -188,29 +222,98 @@
       "may_author_plan": false,
       "may_formally_review": true,
       "primary": {
-        "model": "GPT-5.6 Sol",
-        "harness": "Pi",
-        "default_effort": "XHIGH",
-        "allowed_effort_band": [
-          "XHIGH"
-        ]
+        "model_ref": "GPT_LATEST",
+        "harness": "Codex",
+        "effort_profile_ref": "GPT_STANDARD"
       }
     },
+    "GROK_REVIEW": {
+      "capability": "independent formal review seat for STANDARD and CRITICAL candidates, including structural work and binding plans",
+      "capability_class": "review",
+      "default": true,
+      "may_author_plan": false,
+      "may_formally_review": true,
+      "selection_rules": [
+        {
+          "rule_id": "GROK_REVIEW_STANDARD",
+          "when": {
+            "lane": "STANDARD"
+          },
+          "binding": {
+            "model_ref": "GROK_LATEST",
+            "harness": "Grok Build",
+            "default_effort": "HIGH",
+            "allowed_effort_band": [
+              "HIGH"
+            ]
+          }
+        },
+        {
+          "rule_id": "GROK_REVIEW_CRITICAL",
+          "when": {
+            "lane": "CRITICAL"
+          },
+          "binding": {
+            "model_ref": "GROK_LATEST",
+            "harness": "Grok Build",
+            "default_effort": "XHIGH",
+            "allowed_effort_band": [
+              "XHIGH"
+            ]
+          }
+        }
+      ]
+    },
     "PROSE": {
-      "capability": "natural-language deliverables",
+      "capability": "prose delivery: articles, documentation, explanations, and presentation of established conclusions; excludes binding-plan authorship and formal review judgment",
       "capability_class": "prose",
       "default": true,
       "may_author_plan": false,
       "may_formally_review": false,
+      "mandatory_route_conditions": [
+        {
+          "condition_id": "PROSE_FOUR_OR_MORE_SENTENCES",
+          "when": "work_is_prose_delivery_and_output_is_article_documentation_or_explanation_or_expected_to_contain_four_or_more_sentences"
+        }
+      ],
+      "dispatch_triggers": [
+        {
+          "trigger_id": "PROSE_SPLIT_MIXED_CARD",
+          "when": "card_mixes_nonprose_work_with_required_prose_delivery",
+          "action": "split_the_prose_into_a_separate_PROSE_card"
+        }
+      ],
       "primary": {
-        "model": "Gemini 3.7 Flash",
-        "harness": "shared_harness",
-        "default_effort": "MEDIUM",
+        "model_ref": "GEMINI_FLASH_LATEST",
+        "harness": "Antigravity",
+        "default_effort": "HIGH",
         "allowed_effort_band": [
-          "MEDIUM"
+          "HIGH"
         ]
       }
     }
   },
-  "scope_clamp": "Stay strictly within this card's objective, authority, read scope, and write scope. If additional work is required, state the missing scope in one line and stop. Do not perform that additional work."
+  "scope_clamp": "Stay strictly within this card's objective, authority, read scope, and write scope. If additional work is required, state the missing scope in one line and stop. Do not perform that additional work.",
+  "problem_solving_quota_order": [
+    "highest_capability_model",
+    "highest_capability_quota_alternative",
+    "general_execution_model"
+  ],
+  "harnesses": {
+    "Pi": {
+      "herdr_kind": "pi"
+    },
+    "Antigravity": {
+      "herdr_kind": "agy"
+    },
+    "Grok Build": {
+      "herdr_kind": "grok"
+    },
+    "Codex": {
+      "herdr_kind": "codex"
+    },
+    "Cursor": {
+      "herdr_kind": "cursor"
+    }
+  }
 }
