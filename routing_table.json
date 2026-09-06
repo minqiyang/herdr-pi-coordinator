@@ -1,5 +1,5 @@
 {
-  "table_version": "7.13-draft",
+  "table_version": "7.14-draft",
   "status": "TEMPLATE_NOT_ACTIVE",
   "child_session_defaults": {
     "permission_mode": "auto"
@@ -291,6 +291,62 @@
           "HIGH"
         ]
       }
+    },
+    "PR_REASSESS_GROK": {
+      "capability": "fresh read-only whole-PR reassessment after repeated unresolved P1/P2 reviews",
+      "capability_class": "pr_reassessment",
+      "default": false,
+      "may_author_plan": false,
+      "may_formally_review": true,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "PR_REVIEW_LOOP_REASSESSMENT",
+          "when": "pr_review_loop_triggered_and_coordinator_dispatches_this_analysis_seat"
+        }
+      ],
+      "primary": {
+        "model_ref": "GROK_LATEST",
+        "harness": "Grok Build",
+        "default_effort": "XHIGH",
+        "allowed_effort_band": [
+          "XHIGH"
+        ]
+      }
+    },
+    "PR_REASSESS_GEMINI": {
+      "capability": "fresh read-only whole-PR reassessment after repeated unresolved P1/P2 reviews",
+      "capability_class": "pr_reassessment",
+      "default": false,
+      "may_author_plan": false,
+      "may_formally_review": true,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "PR_REVIEW_LOOP_REASSESSMENT",
+          "when": "pr_review_loop_triggered_and_coordinator_dispatches_this_analysis_seat"
+        }
+      ],
+      "primary": {
+        "model_ref": "GEMINI_FLASH_LATEST",
+        "harness": "Antigravity",
+        "default_effort": "HIGH",
+        "allowed_effort_band": [
+          "HIGH"
+        ]
+      }
+    },
+    "PR_FINAL_REVIEW": {
+      "capability": "independent read-only final adjudication after whole-PR reassessment; no implementation or plan authorship",
+      "capability_class": "pr_final_review",
+      "default": false,
+      "may_author_plan": false,
+      "may_formally_review": true,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "COORDINATOR_REQUESTED_PR_FINAL_REVIEW",
+          "when": "both_required_pr_reassessments_complete_and_coordinator_records_decision_to_request_final_review"
+        }
+      ],
+      "quota_binding_order_ref": "problem_solving_quota_order"
     }
   },
   "scope_clamp": "Stay strictly within this card's objective, authority, read scope, and write scope. If additional work is required, state the missing scope in one line and stop. Do not perform that additional work.",
@@ -315,5 +371,17 @@
     "Cursor": {
       "herdr_kind": "cursor"
     }
+  },
+  "pr_review_loop": {
+    "completed_rounds_exceed": 3,
+    "severities": [
+      "P1",
+      "P2"
+    ],
+    "analysis_routes": [
+      "PR_REASSESS_GROK",
+      "PR_REASSESS_GEMINI"
+    ],
+    "optional_final_review_route": "PR_FINAL_REVIEW"
   }
 }
