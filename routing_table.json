@@ -1,5 +1,5 @@
 {
-  "table_version": "7.15-draft",
+  "table_version": "7.21-draft",
   "status": "TEMPLATE_NOT_ACTIVE",
   "child_session_defaults": {
     "permission_mode": "auto"
@@ -51,13 +51,22 @@
       "family": "Opus",
       "selector": "latest",
       "access_plan_ref": "cursor_ultra"
+    },
+    "GEMINI_LATEST": {
+      "family": "Gemini",
+      "selector": "latest",
+      "access_plan_ref": "gemini_ai_pro"
+    },
+    "GPT_ASTRA_LATEST": {
+      "family": "GPT Astra",
+      "selector": "latest",
+      "access_plan_ref": "chatgpt_plus"
     }
   },
   "effort_profiles": {
     "GPT_STANDARD": {
       "default_effort": "medium",
       "allowed_effort_band": [
-        "light",
         "medium"
       ]
     }
@@ -73,9 +82,9 @@
   "highest_capability_model": {
     "model_ref": "GPT_LATEST",
     "harness": "Codex",
-    "default_effort": "high",
+    "default_effort": "xhigh",
     "allowed_effort_band": [
-      "high"
+      "xhigh"
     ]
   },
   "highest_capability_quota_alternative": {
@@ -110,7 +119,7 @@
       }
     },
     "GENERAL_EXEC": {
-      "capability": "ordinary implementation, debugging, fixing, integration, and interaction logic",
+      "capability": "ordinary implementation, debugging, integration, and interaction logic; repair work uses FIXER",
       "capability_class": "implementation",
       "default": true,
       "may_author_plan": false,
@@ -127,11 +136,11 @@
       "may_author_plan": false,
       "may_formally_review": true,
       "primary": {
-        "model_ref": "GEMINI_FLASH_LATEST",
+        "model_ref": "GEMINI_LATEST",
         "harness": "Antigravity",
-        "default_effort": "HIGH",
+        "default_effort": "MAX_SUPPORTED",
         "allowed_effort_band": [
-          "HIGH"
+          "MAX_SUPPORTED"
         ]
       }
     },
@@ -166,11 +175,15 @@
         {
           "trigger_id": "EVIDENCED_BLOCKER_PERSISTS",
           "when": "same_blocker_remains_after_required_qualifying_attempts_with_no_clear_general_fix_next_step_and_environment_permission_quota_and_requirement_ambiguity_causes_ruled_out",
-          "minimum_qualifying_attempts": 4
+          "minimum_qualifying_attempts": 2
         },
         {
           "trigger_id": "USER_REQUESTED_EXPERT",
           "when": "user_explicitly_requests_expert_escalation_for_this_task"
+        },
+        {
+          "trigger_id": "EXPERT_REPAIR_CONTINUATION",
+          "when": "same_previously_escalated_core_problem_remains_or_evidence_shows_repairs_are_worsening_it_and_coordinator_records_expert_continuation"
         }
       ],
       "prompt_constraints": [
@@ -222,7 +235,7 @@
       "may_author_plan": false,
       "may_formally_review": true,
       "primary": {
-        "model_ref": "GPT_LATEST",
+        "model_ref": "GPT_ASTRA_LATEST",
         "harness": "Codex",
         "effort_profile_ref": "GPT_STANDARD"
       }
@@ -233,36 +246,14 @@
       "default": true,
       "may_author_plan": false,
       "may_formally_review": true,
-      "selection_rules": [
-        {
-          "rule_id": "GROK_REVIEW_STANDARD",
-          "when": {
-            "lane": "STANDARD"
-          },
-          "binding": {
-            "model_ref": "GROK_LATEST",
-            "harness": "Grok Build",
-            "default_effort": "HIGH",
-            "allowed_effort_band": [
-              "HIGH"
-            ]
-          }
-        },
-        {
-          "rule_id": "GROK_REVIEW_CRITICAL",
-          "when": {
-            "lane": "CRITICAL"
-          },
-          "binding": {
-            "model_ref": "GROK_LATEST",
-            "harness": "Grok Build",
-            "default_effort": "XHIGH",
-            "allowed_effort_band": [
-              "XHIGH"
-            ]
-          }
-        }
-      ]
+      "primary": {
+        "model_ref": "GROK_LATEST",
+        "harness": "Grok Build",
+        "default_effort": "XHIGH",
+        "allowed_effort_band": [
+          "XHIGH"
+        ]
+      }
     },
     "PROSE": {
       "capability": "prose delivery: articles, documentation, explanations, and presentation of established conclusions; excludes binding-plan authorship and formal review judgment",
@@ -291,6 +282,49 @@
           "HIGH"
         ]
       }
+    },
+    "FIXER": {
+      "capability": "repair of identified defects, failed QA, or confirmed review findings under existing requirements",
+      "capability_class": "implementation",
+      "default": false,
+      "may_author_plan": false,
+      "may_formally_review": false,
+      "dispatch_triggers": [
+        {
+          "trigger_id": "REPAIR_IDENTIFIED_DEFECT",
+          "when": "task_objective_is_to_repair_an_identified_defect_failed_QA_or_confirmed_review_finding_under_existing_requirements"
+        }
+      ],
+      "primary": {
+        "model_ref": "GROK_LATEST",
+        "harness": "Grok Build",
+        "default_effort": "XHIGH",
+        "allowed_effort_band": [
+          "XHIGH"
+        ]
+      },
+      "prompt_constraints": [
+        "scope_clamp"
+      ]
+    },
+    "ABLATION": {
+      "capability": "post-delivery ablation experiments and evidence-backed simplification of major designs or implementations",
+      "capability_class": "simplification",
+      "default": false,
+      "may_author_plan": true,
+      "may_formally_review": false,
+      "mandatory_route_conditions": [
+        {
+          "condition_id": "MAJOR_DELIVERY_ABLATION",
+          "when": "major_design_or_implementation_candidate_ready_before_final_acceptance"
+        }
+      ],
+      "quota_binding_order_ref": "problem_solving_quota_order",
+      "effort_override": "HIGH",
+      "prompt_constraints": [
+        "scope_clamp",
+        "ablation_prompt"
+      ]
     }
   },
   "scope_clamp": "Stay strictly within this card's objective, authority, read scope, and write scope. If additional work is required, state the missing scope in one line and stop. Do not perform that additional work.",
@@ -315,5 +349,6 @@
     "Cursor": {
       "herdr_kind": "cursor"
     }
-  }
+  },
+  "ablation_prompt": "Perform ablation experiments on this completed design or implementation: identify potentially unnecessary abstractions, design elements, and code; remove or simplify them one at a time in a separate candidate and compare against the baseline using relevant acceptance tests and evidence. Keep only demonstrated simplifications that preserve required behavior, contracts, safety, and recovery. Restore changes that regress behavior; do not remove tests or weaken acceptance criteria to claim success. Record each experiment, result, retained/reverted change, and untested uncertainty in the local report. A supported no-change conclusion is valid."
 }
