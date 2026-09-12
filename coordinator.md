@@ -1,4 +1,4 @@
-# Herdr + Pi Coordinator Operating Card v7.21-draft
+# Herdr + Pi Coordinator Operating Card v7.22-draft
 
 **Status:** LIVE_OPERATING_CARD
 This card and `routing_table.json` are the only coordinator workflow policy files. User authorization and project constraints still govern the work. Do not load `archive/`.
@@ -23,8 +23,8 @@ Every card has exactly one lane: STANDARD or CRITICAL. Structural is an overlay,
 
 | Lane | When | Gate |
 |---|---|---|
-| STANDARD | Default for ordinary work, including mechanical changes | QA PASS + 2 fresh independent formal reviewers |
-| CRITICAL | An error could invalidate project results, corrupt canonical state, cross a trust boundary, create irreversible effects, invalidate a release or migration, or cause expensive downstream rework | QA PASS + 3 fresh independent formal reviewers |
+| STANDARD | Default for ordinary work, including mechanical changes | QA PASS + 1 fresh independent formal reviewer |
+| CRITICAL | An error could invalidate project results, corrupt canonical state, cross a trust boundary, create irreversible effects, invalidate a release or migration, or cause expensive downstream rework | QA PASS + 2 fresh independent formal reviewers |
 
 Mechanical work has no QA-only exemption. Use CRITICAL whenever its risk criteria apply; otherwise use STANDARD.
 
@@ -61,7 +61,7 @@ No catch-all structural reason. Structural work requires an accepted binding pla
 - Deterministic QA owns every machine-verifiable fact the card can produce. Distinguish baseline failures from candidate-introduced failures with evidence. Formal review does not start until required QA passes.
 - Freeze the candidate and identify its exact bytes as `candidate_digest`: use a Git commit/tree covering the complete candidate, or a frozen file manifest with content hashes covering files outside Git. A branch name or mutable directory alone is not an exact identity. QA, all reviewers, and acceptance refer to this same candidate and its evidence.
 - Formal reviewers are visible, fresh, read-only, outside producer lineage, and mutually blind during initial review. Fresh means no producer context or hidden continuation. Review runs in a clean root, never the producer worktree. Record each reviewer session and the concrete model resolved at dispatch; session identity and model identity are distinct.
-- Use the lane's reviewer count. Session and context/lineage independence are mandatory. Normally routed STANDARD and CRITICAL work require pairwise different underlying models across all required seats. When any two or more seats resolve to the same model, by design or replacement, a non-structural candidate may continue with `diversity_degraded` recorded; structural work and binding plans require an explicit owner decision on that degradation. Model-diversity approval never waives the required reviewer count or session or lineage independence.
+- Use the lane's reviewer count. Session and context/lineage independence from the producer are mandatory even for STANDARD's single seat. Pairwise underlying-model diversity applies when multiple review seats are required. When any two or more seats resolve to the same model, by design or replacement, a non-structural candidate may continue with `diversity_degraded` recorded; structural work and binding plans require an explicit owner decision on that degradation. Model-diversity approval never waives the required reviewer count or session or lineage independence.
 
 ### 2. Record findings
 

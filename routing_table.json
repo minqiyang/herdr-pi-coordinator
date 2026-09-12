@@ -1,5 +1,5 @@
 {
-  "table_version": "7.21-draft",
+  "table_version": "7.22-draft",
   "status": "TEMPLATE_NOT_ACTIVE",
   "child_session_defaults": {
     "permission_mode": "auto"
@@ -65,9 +65,9 @@
   },
   "effort_profiles": {
     "GPT_STANDARD": {
-      "default_effort": "medium",
+      "default_effort": "high",
       "allowed_effort_band": [
-        "medium"
+        "high"
       ]
     }
   },
@@ -97,13 +97,11 @@
   },
   "review_seats": {
     "STANDARD": [
-      "REVIEW",
       "GROK_REVIEW"
     ],
     "CRITICAL": [
-      "REVIEW",
-      "AUDIT",
-      "GROK_REVIEW"
+      "GROK_REVIEW",
+      "AUDIT"
     ]
   },
   "routes": {

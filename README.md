@@ -1,6 +1,6 @@
 # Herdr + Pi coordinator
 
-Declared version: **7.21-draft**. Identity is filename + declared version.
+Declared version: **7.22-draft**. Identity is filename + declared version.
 
 These two files are the only coordinator workflow policy. User authorization and project constraints still apply. Do not load historical drafts.
 
@@ -9,7 +9,7 @@ These two files are the only coordinator workflow policy. User authorization and
 | `coordinator.md` | tasks, writers, lanes, QA/review, routing rules, handoff, plans, integration, publication boundaries |
 | `routing_table.json` | routes, aliases, bindings, harness mappings, effort profiles, child-session permission defaults, triggers |
 
-The operating card covers the [QA/review lifecycle](coordinator.md#3-qa-and-review), task scope, writer handoff, evidence/progress records, plan acceptance, routing/alias resolution, integration, and publication boundaries. Version 7.21 adds [continued waiting and result reconciliation](coordinator.md#6-evidence-progress-and-handoff) after dispatch. File-first handoffs remain in force; the reverted PR-review-loop policy remains absent; see [Routing](coordinator.md#4-routing) and `routing_table.json`. The operating card is self-contained; historical drafts are not policy dependencies. It does not provide event replay, epoch fencing, or automatic crash recovery.
+The operating card covers the [QA/review lifecycle](coordinator.md#3-qa-and-review), task scope, writer handoff, evidence/progress records, plan acceptance, routing/alias resolution, integration, and publication boundaries. Version 7.22 updates the [lane review requirements](coordinator.md#2-lanes-and-gates) and reviewer bindings in `routing_table.json`. Continued waiting remains in force. File-first handoffs remain in force; the reverted PR-review-loop policy remains absent; see [Routing](coordinator.md#4-routing) and `routing_table.json`. The operating card is self-contained; historical drafts are not policy dependencies. It does not provide event replay, epoch fencing, or automatic crash recovery.
 
 ## How to use
 
@@ -20,7 +20,7 @@ The operating card covers the [QA/review lifecycle](coordinator.md#3-qa-and-revi
 ```text
 Read coordinator.md and routing_table.json as the coordinator workflow policy,
 within the user's authorization and project constraints.
-Declared version: 7.21-draft. Do not load archive/. Follow the card.
+Declared version: 7.22-draft. Do not load archive/. Follow the card.
 ```
 
 ## Optional local components
